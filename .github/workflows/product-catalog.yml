@@ -29,7 +29,7 @@ jobs:
           go test ./src/product-catalog/... -v  -covprofile=coverage.out
 
       - name: Upload Coverage Report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: coverage-report
           path: coverage.out 
