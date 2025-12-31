@@ -19,17 +19,20 @@ jobs:
         with:
           go-version: '1.20'
 
+
       - name: Build Product Catalog Service
-        run: 
-          cd src/product-catalog
+        working-directory: src/product-catalog
+        run: |
           go mod download
           go build -o product-catalog-service main.go
+
       - name: Run Tests
-        run: 
-          go test ./src/product-catalog/... -v  -covprofile=coverage.out
+        working-directory: src/product-catalog
+        run: |
+          go test ./... -v -coverprofile=coverage.out
 
       - name: Upload Coverage Report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v
         with:
           name: coverage-report
           path: coverage.out 
@@ -79,7 +82,7 @@ jobs:
 
       - name : update tag in k8s deployment file
         run: |
-         sed -i 's|image: .*|image: '${{ secrets.DOCKER_USERNAME }}'/product-catalog:'"${{ github.sha }}"'|g' kubernetes/productcatalog/deploy.yaml 
+          sed -i 's|image: .*|image: '${{ secrets.DOCKER_USERNAME }}'/product-catalog:'"${{ github.sha }}"'|g' kubernetes/productcatalog/deploy.yaml
 
       - name: Commit and Push changes
         run: |
@@ -87,5 +90,5 @@ jobs:
           git config --global user.email 'amaradhi.padmaja@gmail.com'
           git add kubernetes/productcatalog/deploy.yaml
           git commit -m "[CI]: Update product-catalog image tag to ${{ github.sha }}"
-          git push  
+          git push
 
